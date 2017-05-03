@@ -1,11 +1,12 @@
 <?php
-	$db = mysql_connect('127.0.0.1','XXX','XXX') or die('Failed to connect: ' .mysql_error());
-	mysql_select_db('pogopogo_highscores') or die('Failed to access database');
+	//Create a config file outside of the webroot.
+	$config = parse_ini_file('../../private/config.ini');
+	$db = mysql_connect('127.0.0.1',$config['username'],$config['password']) or die('Failed to connect: ' .mysql_error());
+	mysql_select_db($config['database']) or die('Failed to access database');
 	$username = mysql_real_escape_string($_GET['name'], $db);
 	$score = mysql_real_escape_string($_GET['score'], $db);
 	$hash = $_GET['hash'];
-	$privateKey = file_get_contents('~/HighScoreSettings/pk.txt');
-	$expected_hash = md5($username . $score . $privateKey);
+	$expected_hash = md5($username . $score . $config['privatekey']);
 	if($expected_hash == $hash) {
 		$query = "INSERT INTO HighScores (name, score, ts)
 		VALUES ('$username', '$score', CURRENT_TIMESTAMP);";
